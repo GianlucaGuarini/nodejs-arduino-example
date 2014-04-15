@@ -1,7 +1,7 @@
 {
   "name": "nodejs-arduino-example",
   "version": "0.0.2",
-  "description": "Simple example to show how to use arduino to communicate digital signals to a nodejs server",
+  "description": "Simple example to show how to use arduino to send digital signals to a nodejs server",
   "main": "server.js",
   "dependencies": {
     "serialport": "^1.2.5",
@@ -10,7 +10,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server/server.js"
   },
   "repository": {
     "type": "git",
