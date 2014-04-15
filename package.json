@@ -1,17 +1,25 @@
 {
   "name": "nodejs-arduino-example",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple example to show how to use arduino to communicate digital signals to a nodejs server",
   "main": "server.js",
   "dependencies": {
-    "serialport": "~1.2.2"
+    "serialport": "^1.2.5",
+    "socket.io": "^0.9.16"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/GianlucaGuarini/nodejs-arduino-example.git"
+  },
   "author": "Gianluca Guarini",
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GianlucaGuarini/nodejs-arduino-example/issues"
+  },
+  "homepage": "https://github.com/GianlucaGuarini/nodejs-arduino-example"
 }
