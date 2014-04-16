@@ -21,7 +21,7 @@ void loop()
   int tmpButtonState = digitalRead(pinNumber);
   // if it has not been clicked yet and it's down we can send the message
   if (tmpButtonState == HIGH && buttonClicked == false) {
-    Serial.print("Hello World");
+    Serial.printLn("Hello World");
     digitalWrite(led, HIGH);
     delay(1000); // wait 1 s before sending the next message
     buttonClicked = true;
