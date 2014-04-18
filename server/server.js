@@ -12,12 +12,10 @@ var app = require('http').createServer(handler),
   // initialize serialport using the /dev/cu.usbmodem1411 serial port
   // remember to change this string if your arduino is using a different serial port
   sp = new SerialPort('/dev/cu.usbmodem1411', {
-    baudrate: 57600
+    baudRate: 57600
   }),
   // this var will contain the output string coming from arduino
-  outputStr = '',
-  // timer used to output correctly all the messages coming from arduino
-  outputTimer;
+  outputStr = '';
 
 // creating the server ( localhost:8000 )
 app.listen(8000);
@@ -34,7 +32,6 @@ function handler(req, res) {
     res.end(data);
   });
 }
-
 /**
  *
  * This function is used as proxy to print the arduino messages into the nodejs console
@@ -46,18 +43,14 @@ var printOutput = function(buffer, socket) {
   // concatenating the string buffers sent via usb port
   outputStr += buffer.toString();
 
-  // avoiding to trigger the timer more than once
-  clearTimeout(outputTimer);
-
-  // wait 500 ms and then output the message
-  outputTimer = setTimeout(function() {
+  if (outputStr.indexOf('{') >= 0 && outputStr.indexOf('}') >= 0) {
     // log the message into the terminal
     console.log(outputStr);
     // send the message to the client
-    socket.volatile.emit('notification', outputStr);
+    socket.volatile.emit('notification', outputStr.replace(/\{|\}/gi, ''));
     // reset the output string to an empty value
     outputStr = '';
-  }, 500);
+  }
 };
 
 // creating a new websocket
@@ -65,6 +58,12 @@ io.sockets.on('connection', function(socket) {
   // listen all the serial port messages sent from arduino and passing them to the proxy function printOutput
   sp.on('data', function(data) {
     printOutput(data, socket);
+  });
+  socket.on('lightStatus', function(lightStatus) {
+    sp.write('{' + lightStatus + '}', function() {
+      // log the light status into the terminal
+      console.log('the light should be: ' + lightStatus);
+    });
   });
 });
 

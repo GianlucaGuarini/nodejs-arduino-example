@@ -1,34 +1,52 @@
 <html>
-	<head>
-	<!--
-	 * Author:		Gianluca Guarini
-	 * Contact: 	gianluca.guarini@gmail.com
-	 * Website:		http://www.gianlucaguarini.com/
-	 * Twitter:		@gianlucaguarini
-	-->
-	<title>Arduino and Nodejs</title>
-	<style>
-	center {
-		font-size: 100px;
-		font-family:arial;
-	}
-	</style>
-	</head>
-	<body>
+<head>
+    <!--
+     * Author:      Gianluca Guarini
+     * Contact:     gianluca.guarini@gmail.com
+     * Website:     http://www.gianlucaguarini.com/
+     * Twitter:     @gianlucaguarini
+    -->
+    <title>Arduino and Nodejs</title>
+    <style>
+    center {
+        font-size: 100px;
+        font-family:arial;
+    }
+    </style>
+</head>
+<body>
     <script src="socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+    <button>
+        Turn the light
+        <span>on</span>
+    </button>
     <script>
       // create a new websocket
       var socket = io.connect('http://localhost:8000'),
-      	$body = $('body');
+        $body = $('body'),
+        $btn = $('button'),
+        $lightStatus = $('span',$btn),
+        lightOn = 0,
+        toggleLight = function () {
+          lightOn = !lightOn;
+          var lightStatus = lightOn ? 'on' : 'off';
+
+          socket.emit('lightStatus', lightStatus );
+          $lightStatus.text(lightStatus);
+        };
+
+      $btn.on('click',toggleLight);
+
       socket.on('notification', function (data) {
-      	var $div = $('<center>');
-      	$div.html(data);
-      	$body.append($div);
-      	$div.delay(1000).fadeOut(function(){
-      		$div.remove();
-      	});
+        var $div = $('<center>');
+        $div.html(data);
+        $body.append($div);
+        $div.delay(1000).fadeOut(function(){
+            $div.remove();
+        });
       });
     </script>
-    </body>
+</body>
 </html>
