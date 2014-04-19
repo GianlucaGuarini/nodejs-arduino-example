@@ -1,54 +1,97 @@
-// button pin
-int pinNumber = 7;
-// debugger led
-int led = 13;
-// simple switch variable
-bool buttonClicked = false;
-bool ledOn = false;
+// pin of the button connected to the arduino board
+const int buttonPin = 7;
+// pin of the led light
+// it's actually also the default arduino debug light
+const int ledPin = 13;
 
+// simple variables used to store the led and the button statuses
+String buttonStatus = "off";
+String ledStatus = "off";
 
-String inputString = "";         // a string to hold incoming data
-boolean stringComplete = false;  // whether the string is complete
+// it will hold all the messages coming from the nodejs server
+String inputString = "";
 
+// whether the string received form nodejs is complete
+// a string is considered complete by the carriage return '\r'
+boolean stringComplete = false;
+
+/**
+ *
+ * arduino board setup
+ *
+ */
 
 void setup()
 {
-  // set the bps
-  Serial.begin(57600);
+  // set the Baud Rate
+  Serial.begin(115200);
   // set the input pin
-  pinMode(pinNumber, INPUT);
+  pinMode(buttonPin, INPUT);
   // initialize the LED pin as an output:
-  pinMode(led, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 }
+
+/**
+ *
+ * Default arduino loop function
+ * it runs over and over again
+ *
+ */
 
 void loop()
 {
-  // read the button state
-  int tmpButtonState = digitalRead(pinNumber);
+  // read the button state and send a message to the nodejs server
+  listenButtonChanges(digitalRead(buttonPin));
+  // update the status of the led light connected to the arduino board
+  updateLedStatus();
+}
 
+/**
+ *
+ * check the button connected to the pin 7 of the arduino board and
+ * send messages through the serial port whenever the button gets clicked
+ * @param  { boolean } tmpButtonStatus: its the current status of the button
+ *
+ */
+
+void listenButtonChanges (boolean tmpButtonStatus) {
   // if it has not been clicked yet and it's down we can send the message
-  if (tmpButtonState == HIGH && !buttonClicked) {
-    Serial.println(F("{Hello World}"));
-    delay(1000); // wait 1 s before sending the next message
-    buttonClicked = true;
+  if (tmpButtonStatus && buttonStatus == "off") {
+    buttonStatus = "on";
+    Serial.println("Hello World");
+    // wait 1 s before sending the next message
+    delay(1000);
   }
-  // print the string when a newline arrives:
+  // if the button is not pressed anymore we reset the buttonStatus variable to off
+  if (!tmpButtonStatus) {
+    buttonStatus = "off";
+  }
+}
+
+/**
+ *
+ * Update the status of the led light reading the messages dispatched by the nodejs server
+ *
+ */
+
+void updateLedStatus() {
+  // detect whether the string has been completely received
   if (stringComplete) {
-    if (inputString == "{on}") {
-      ledOn = true;
-    } else if (inputString == "{off}") {
-      ledOn = false;
+    // set and store the current led status
+    if (inputString == "on\r") {
+      ledStatus = "on";
     }
-    Serial.println(inputString);
+    if (inputString == "off\r") {
+      ledStatus = "off";
+    }
+    // send the light status to the nodejs server
+    Serial.println(ledStatus);
     // clear the string:
     inputString = "";
     stringComplete = false;
   }
-  // if the button is not pressed anymore we reset the buttonClicked variable to false
-  if (tmpButtonState == LOW)
-    buttonClicked = false;
-
-  digitalWrite(led, ledOn ? HIGH : LOW);
+  // turn on or off the led according to the latest light status stored
+  digitalWrite(ledPin, ledStatus == "on" ? HIGH : LOW);
 }
 
 /*
@@ -57,15 +100,14 @@ void loop()
  time loop() runs, so using delay inside loop can delay
  response.  Multiple bytes of data may be available.
  */
-void serialEvent() {
+ void serialEvent() {
   while (Serial.available()) {
     // get the new byte:
     char inChar = (char)Serial.read();
     // add it to the inputString:
     inputString += inChar;
-    // if the incoming character is a newline, set a flag
-    // so the main loop can do something about it:
-    if (inChar == '}') {
+    // if the incoming character is a "\n" we detect the end of the string
+    if (inChar == '\r') {
       stringComplete = true;
     }
   }

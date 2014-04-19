@@ -15,38 +15,12 @@
     </style>
 </head>
 <body>
-    <script src="socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-
     <button>
         Turn the light
         <span>on</span>
     </button>
-    <script>
-      // create a new websocket
-      var socket = io.connect('http://localhost:8000'),
-        $body = $('body'),
-        $btn = $('button'),
-        $lightStatus = $('span',$btn),
-        lightOn = 0,
-        toggleLight = function () {
-          lightOn = !lightOn;
-          var lightStatus = lightOn ? 'on' : 'off';
-
-          socket.emit('lightStatus', lightStatus );
-          $lightStatus.text(lightStatus);
-        };
-
-      $btn.on('click',toggleLight);
-
-      socket.on('notification', function (data) {
-        var $div = $('<center>');
-        $div.html(data);
-        $body.append($div);
-        $div.delay(1000).fadeOut(function(){
-            $div.remove();
-        });
-      });
-    </script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
