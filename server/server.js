@@ -8,7 +8,7 @@ var app = require('http').createServer(handler),
   sp = new SerialPort('/dev/cu.usbmodem1411', {
     baudRate: 115200
   }),
-  // this var will contain the message string coming dispatched by arduino
+  // this var will contain the message string dispatched by arduino
   arduinoMessage = '',
   /**
    * helper function to load any app file required by client.html
@@ -34,14 +34,14 @@ var app = require('http').createServer(handler),
    *
    * This function is used as proxy to print the arduino messages into the nodejs console and on the page
    * @param  { Buffer } buffer: buffer data sent via serialport
-   * @param  { Object } socket: it's the socket.io instance managing the connections with the clint.html page
+   * @param  { Object } socket: it's the socket.io instance managing the connections with the client.html page
    *
    */
   sendMessage = function(buffer, socket) {
     // concatenating the string buffers sent via usb port
     arduinoMessage += buffer.toString();
 
-    // detecting the string delimiters
+    // detecting the end of the string
     if (arduinoMessage.indexOf('\r') >= 0) {
       // log the message into the terminal
       // console.log(arduinoMessage);
